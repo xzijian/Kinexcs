@@ -51,21 +51,22 @@ def view_customer():
                 cur.execute(s)
                 list_cust = cur.fetchall()
                 return render_template('customer.html', list_cust = list_cust)
-    elif request.headers['Content-Type'] == 'application/json':
-        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        s = "SELECT * FROM customer ORDER BY id"
-        cur.execute(s)
-        list_cust = cur.fetchall()
-        #return render_template('customer.html', list_cust = list_cust)
-        #return jsonify(json_list = list_cust)
-        content = {}
-        customer = []
-        for result in list_cust:
-            content = {'id' : result['id'], 'name' : result['name'], 'dob' : result['dob']}
-            customer.append(content)
-            content = {}
-
-        return jsonify(customer)
+    #elif request.headers['Content-Type'] == 'application/json':
+    #    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    #    s = "SELECT * FROM customer ORDER BY id"
+    #    cur.execute(s)
+    #    list_cust = cur.fetchall()
+    #    #return render_template('customer.html', list_cust = list_cust)
+    #    #return jsonify(json_list = list_cust)
+    #    content = {}
+    #    customer = []
+    #    for result in list_cust:
+    #        content = {'id' : result['id'], 'name' : result['name'], 'dob' : result['dob']}
+    #        customer.append(content)
+    #        content = {}
+    #    return jsonify(customer)
+    else:
+        return render_template('customer.html')
 
 @app.route('/order')
 def view_order():
@@ -99,19 +100,19 @@ def view_order():
                 list_orders = cur.fetchall()
                 return render_template('orders.html', list_orders = list_orders)
     else:
-        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        s = "SELECT * FROM orders ORDER BY datetime ASC"
-        cur.execute(s)
-        list_orders = cur.fetchall()
-        #return render_template('orders.html', list_orders = list_orders)
-        content = {}
-        orders = []
-        for result in list_orders:
-            content = {'item_name' : result['item_name'], 'item_price' : result['item_price'], 'datetime' : result['datetime'], 'customer_id' : result['customer_id']}
-            orders.append(content)
-            content = {}
-
-        return jsonify(orders)
+    #    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    #    s = "SELECT * FROM orders ORDER BY datetime ASC"
+    #    cur.execute(s)
+    #    list_orders = cur.fetchall()
+    #    #return render_template('orders.html', list_orders = list_orders)
+    #    content = {}
+    #    orders = []
+    #    for result in list_orders:
+    #        content = {'item_name' : result['item_name'], 'item_price' : result['item_price'], 'datetime' : result['datetime'], 'customer_id' : result['customer_id']}
+    #        orders.append(content)
+    #        content = {}
+    #    return jsonify(orders)
+        return render_template('orders.html')
 
 @app.route('/customer/create', methods=['POST','GET'])
 def create_customer():
