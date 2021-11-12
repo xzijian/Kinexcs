@@ -24,20 +24,24 @@ def view_customer():
     if request.method == 'GET':
         user = request.args.get('number')
         if user==None:
-            cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-            s = "SELECT * FROM customer ORDER BY id"
-            cur.execute(s)
-            list_cust = cur.fetchall()
-            #return render_template('customer.html', list_cust = list_cust)
-            #return jsonify(json_list = list_cust)
-            content = {}
-            customer = []
-            for result in list_cust:
-                content = {'id' : result['id'], 'name' : result['name'], 'dob' : result['dob']}
-                customer.append(content)
+            try:
+                cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+                s = "SELECT * FROM customer ORDER BY id"
+                cur.execute(s)
+                list_cust = cur.fetchall()
+                #return render_template('customer.html', list_cust = list_cust)
+                #return jsonify(json_list = list_cust)
                 content = {}
+                customer = []
+                for result in list_cust:
+                    content = {'id' : result['id'], 'name' : result['name'], 'dob' : result['dob']}
+                    customer.append(content)
+                    content = {}
 
-            return jsonify(customer)
+                return jsonify(customer)
+            except:
+                conn.rollback()
+                return render_template('index.html')
         else:
             try:
                 cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -68,24 +72,27 @@ def view_customer():
     else:
         return render_template('customer.html')
 
-@app.route('/order')
+@app.route('/order', methods = ['POST','GET'])
 def view_order():
     if request.method == 'GET':
         user = request.args.get('customer_id')
         if user == None:
-            cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-            s = "SELECT * FROM orders ORDER BY datetime ASC"
-            cur.execute(s)
-            list_orders = cur.fetchall()
-            #return render_template('orders.html', list_orders = list_orders)
-            content = {}
-            orders = []
-            for result in list_orders:
-                content = {'item_name' : result['item_name'], 'item_price' : result['item_price'], 'datetime' : result['datetime'], 'customer_id' : result['customer_id']}
-                orders.append(content)
+            try:
+                cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+                s = "SELECT * FROM orders ORDER BY datetime ASC"
+                cur.execute(s)
+                list_orders = cur.fetchall()
+                #return render_template('orders.html', list_orders = list_orders)
                 content = {}
-
-            return jsonify(orders)
+                orders = []
+                for result in list_orders:
+                    content = {'order_id' : result['order_id'], 'item_id' : result['item_id'], 'item_name' : result['item_name'], 'item_price' : result['item_price'], 'datetime' : result['datetime'], 'customer_id' : result['customer_id']}
+                    orders.append(content)
+                    content = {}
+                return jsonify(orders)
+            except:
+                conn.rollback()
+                return render_template('index.html')
         else:
             try:
                 cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -114,6 +121,20 @@ def view_order():
     #    return jsonify(orders)
         return render_template('orders.html')
 
+@app.route('/items')
+def view_items():
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    s = "SELECT * FROM items ORDER BY item_id"
+    cur.execute(s)
+    list_orders = cur.fetchall()
+    content = {}
+    orders = []
+    for result in list_orders:
+        content = {'item_id' : result['item_id'], 'item_name' : result['item_name'], 'item_price' : result['item_price']}
+        orders.append(content)
+        content = {}
+    return jsonify(orders)
+
 @app.route('/customer/create', methods=['POST','GET'])
 def create_customer():
     if request.method == 'POST':
@@ -130,6 +151,29 @@ def create_customer():
     else:
         return render_template('createCus.html')
 
-
+@app.route('/order/create', methods=['POST','GET'])
+def create_order():
+    if request.method == 'POST':
+        Oid = request.form['Oid']
+        Iid = request.form['Iid']
+        cid = request.form['cID2']
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        try:
+            cur.execute("""INSERT INTO orders
+                            VALUES (%s,%s,(SELECT item_name
+				                            FROM items
+				                            WHERE item_id = %s),
+                                            (SELECT item_price
+									        FROM items
+									        WHERE item_id = %s),CURRENT_DATE,
+                                            (SELECT id
+		                                    FROM customer
+		                                    WHERE id = %s))""", (Oid, Iid, Iid, Iid, cid))
+            return render_template('index.html')
+        except:
+            conn.rollback()
+            return "Invalid input"
+    else:
+        return render_template('createOrd.html')
 if __name__ == "__main__":
     app.run(debug=True)

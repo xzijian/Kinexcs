@@ -1,0 +1,17 @@
+{%extends 'base.html'%}
+
+{% block head %} 
+<title>Create Order</title>
+{% endblock %}
+
+{% block body %} 
+<div class="content">
+    <h1 style="text-align: center">Create Order</h1>
+    <form action="" method ="POST">
+        <input type="text" name="Oid" id="Oid" placeholder="Enter Order ID">
+        <input type="text" name="Iid" id="Iid" placeholder="Enter Item ID">
+        <input type="text" name="cID2" id="cID2" placeholder="Enter Customer ID">
+        <input type="submit" name ="button2" value="Create Order">
+    </form>
+</div>
+{% endblock %}
