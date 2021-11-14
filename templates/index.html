@@ -12,5 +12,13 @@
     <a href="/items">View Items</a>
     <a href="/customer/create">Create Customer</a>
     <a href="/order/create">Create Order</a>
+    <form action="/order" method ="GET">
+        <input type="text" name="customer_id" id="customer_id" placeholder="Enter Customer ID to search">
+        <input type="submit">
+    </form>
+    <form action="/customer" method ="GET">
+        <input type="text" name='number' placeholder="Enter N for N youngest customers">
+        <input type="submit">
+    </form>
 </div>
 {% endblock %}
