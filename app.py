@@ -48,7 +48,14 @@ def view_customer():
                 cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
                 cur.execute("""SELECT * FROM customer ORDER BY dob DESC LIMIT %s""", user)
                 list_cust = cur.fetchall()
-                return render_template('customer.html', list_cust = list_cust)
+                content = {}
+                customer = []
+                for result in list_cust:
+                    content = {'id' : result['id'], 'name' : result['name'], 'dob' : result['dob']}
+                    customer.append(content)
+                    content = {}
+
+                return jsonify(customer)
             except:
                 conn.rollback()
                 return "Invalid input"
@@ -84,7 +91,13 @@ def view_order():
                 cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
                 cur.execute("""SELECT * FROM orders WHERE customer_id = %s""", user)
                 list_orders = cur.fetchall()
-                return render_template('orders.html', list_orders = list_orders)
+                content = {}
+                orders = []
+                for result in list_orders:
+                    content = {'order_id' : result['order_id'], 'item_id' : result['item_id'], 'item_name' : result['item_name'], 'item_price' : result['item_price'], 'datetime' : result['datetime'], 'customer_id' : result['customer_id']}
+                    orders.append(content)
+                    content = {}
+                return jsonify(orders)
             except:
                 conn.rollback()
                 return "Invalid input"
